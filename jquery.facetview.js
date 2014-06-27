@@ -4,7 +4,7 @@
  * displays faceted browse results by querying a specified elasticsearch index
  * can read config locally or can be passed in as variable when executed
  * or a config variable can point to a remote config
- * 
+ *
  * created by Mark MacGillivray - mark@cottagelabs.com
  *
  * http://cottagelabs.com
@@ -13,7 +13,7 @@
  *
  */
 
-// first define the bind with delay function from (saves loading it separately) 
+// first define the bind with delay function from (saves loading it separately)
 // https://github.com/bgrins/bindWithDelay/blob/master/bindWithDelay.js
 
 (function($) {
@@ -120,22 +120,22 @@ And the result object as retrieved directly from the index is available under "o
 
 searchbox_class
 ---------------
-This should only be set if embedded_search is set to false, and if an alternative search box on the page should 
-be used as the source of search terms. If so, this should be set to 
+This should only be set if embedded_search is set to false, and if an alternative search box on the page should
+be used as the source of search terms. If so, this should be set to
 the class name (including preceding .) of the text input that should be used as the source of the search terms.
-It is only a class instead of an ID so that it can be applied to fields that may already have an ID - 
+It is only a class instead of an ID so that it can be applied to fields that may already have an ID -
 it should really identify a unique box on the page for entering search terms for this instance of facetview.
 So an ID could actually also be used - just precede with # instead of .
-This makes it possible to embed a search box anywhere on a page and have it be used as the source of simple 
+This makes it possible to embed a search box anywhere on a page and have it be used as the source of simple
 search parameters for the facetview. Only the last text box with this clas will be used.
 
 embedded_search
 ---------------
 Default to true, in which case full search term functionality is created and displayed on the page.
-If this is false, the search term text box and options will be hidden, so that new search terms cannot 
+If this is false, the search term text box and options will be hidden, so that new search terms cannot
 be provided by the user.
-It is possible to set an alternative search term input box on the page instead, by setting this to false and 
-also setting a searchbox_class value to identify the basic source of search terms, in which case such a box 
+It is possible to set an alternative search term input box on the page instead, by setting this to false and
+also setting a searchbox_class value to identify the basic source of search terms, in which case such a box
 must be manually created elsewhere on the page.
 
 searchbox_shade
@@ -144,7 +144,7 @@ The background colour to apply to the search box
 
 sharesave_link
 --------------
-Default to true, in which case the searchbox - if drawn by facetview - will be appended with a button that 
+Default to true, in which case the searchbox - if drawn by facetview - will be appended with a button that
 shows the full current search parameters as a URL.
 
 config_file
@@ -160,18 +160,18 @@ If these should be nested, define them with full scope e.g. nestedobj.nestedfiel
 extra_facets
 ------------
 An object of named extra facet objects that should be submitted and executed on each query.
-These will NOT be used to generate filters on the page, but the result object can be queried 
+These will NOT be used to generate filters on the page, but the result object can be queried
 for their content for other purposes.
 
 searchbox_fieldselect
 ---------------------
 A list of objects specifying fields to which search terms should be restricted.
-Each object should have a "display" value for displaying as the name of the option, 
+Each object should have a "display" value for displaying as the name of the option,
 and a "field" option specifying the field to restrict the search to.
 
 search_sortby
 ----------------
-A list of objects describing sort option dropdowns. 
+A list of objects describing sort option dropdowns.
 Each object requires a "display" value, and "field" value upon which to sort results.
 NOTE sort fields must be unique on the ES index, NOT lists. Otherwise it will fail silently. Choose wisely.
 
@@ -184,25 +184,25 @@ include_facets_in_querystring
 -----------------------------
 Default to false.
 Whether or not to include full facet settings in the querystring when it is requested for display.
-This makes it easier to get the querystring for other purposes, but does not change the query that is 
+This makes it easier to get the querystring for other purposes, but does not change the query that is
 sent to the index.
 
 result_display
 --------------
 A display template for search results. It is a list of lists.
-Each list specifies a line. Within each list, specify the contents of the line using objects to describe 
-them. Each content piece should pertain to a particular "field" of the result set, and should specify what 
+Each list specifies a line. Within each list, specify the contents of the line using objects to describe
+them. Each content piece should pertain to a particular "field" of the result set, and should specify what
 to show "pre" and "post" the given field
 
 display_images
 --------------
-Default to true, in which case any image found in a given result object will be displayed to the left 
+Default to true, in which case any image found in a given result object will be displayed to the left
 in the result object output.
 
 description
 -----------
 Just an option to provide a human-friendly description of the functionality of the instantiated facetview.
-Like "search my shop". Will be displayed on the page. 
+Like "search my shop". Will be displayed on the page.
 
 search_url
 ----------
@@ -243,14 +243,14 @@ for the user to finish typing a word.
 
 q
 -
-Specify a query value to start with when the page is loaded. Will be submitted as the initial search value 
+Specify a query value to start with when the page is loaded. Will be submitted as the initial search value
 if initialsearch is enabled. Will also be set as the value of the searchbox on page load.
 
 predefined_filters
 ------------------
-Facet / query values to apply to all searches. Give each one a reference key, then in each object define it 
-as per an elasticsearch query for appending to the bool must. 
-If these filters should be applied at the nested level, then prefix the name with the relevant nesting prefix. 
+Facet / query values to apply to all searches. Give each one a reference key, then in each object define it
+as per an elasticsearch query for appending to the bool must.
+If these filters should be applied at the nested level, then prefix the name with the relevant nesting prefix.
 e.g. if the nested object is called stats, call the filter stats.MYFILTER.
 
 filter
@@ -271,14 +271,14 @@ An object defining the paging settings:
 
 pager_on_top
 ------------
-Default to false, in which case the pager - e.g. result count and prev / next page buttons - only appear 
+Default to false, in which case the pager - e.g. result count and prev / next page buttons - only appear
 at the bottom of the search results.
 Set to true to show the pager at the top of the search results as well.
 
 pager_slider
 ------------
-If this is set to true, then the paging options will be a left and right arrow at the bottom, with the 
-count in between, but a bit bigger and more slider-y than the standard one. Works well for displaying 
+If this is set to true, then the paging options will be a left and right arrow at the bottom, with the
+count in between, but a bit bigger and more slider-y than the standard one. Works well for displaying
 featured content, for example.
 
 sort
@@ -297,8 +297,8 @@ HTML values in which to wrap each result object
 
 result_box_colours
 ------------------
-A list of background colours that will be randomly assigned to each result object that has the "result_box" 
-class. To use this, specify the colours in this list and ensure that the "result_display" option uses the 
+A list of background colours that will be randomly assigned to each result object that has the "result_box"
+class. To use this, specify the colours in this list and ensure that the "result_display" option uses the
 "result_box" class to wrap the result objects.
 
 fadein
@@ -324,9 +324,9 @@ Sets the default operator in text search strings - elasticsearch uses OR by defa
 default_freetext_fuzzify
 ------------------------
 If this exists and is not false, it should be either * or ~. If it is * then * will be prepended and appended
-to each string in the freetext search term, and if it is ~ then ~ will be appended to each string in the freetext 
-search term. If * or ~ or : are already in the freetext search term, it will be assumed the user is already trying 
-to do a complex search term so no action will be taken. NOTE these changes are not replicated into the freetext 
+to each string in the freetext search term, and if it is ~ then ~ will be appended to each string in the freetext
+search term. If * or ~ or : are already in the freetext search term, it will be assumed the user is already trying
+to do a complex search term so no action will be taken. NOTE these changes are not replicated into the freetext
 search box - the end user will not know they are happening.
 
 */
@@ -452,7 +452,7 @@ search box - the end user will not know they are happening.
         // ===============================================
         // functions to do with filters
         // ===============================================
-        
+
         // show the filter values
         var showfiltervals = function(event) {
             event.preventDefault();
@@ -519,7 +519,7 @@ search box - the end user will not know they are happening.
             }
             dosearch();
         };
-        
+
         // adjust how many results are shown
         var morefacetvals = function(event) {
             event.preventDefault();
@@ -544,7 +544,7 @@ search box - the end user will not know they are happening.
             var range = $('#facetview_rangechoices_' + rel, obj).html();
             var newobj = '<div style="display:none;" class="btn-group" id="facetview_rangeresults_' + rel + '"> \
                 <a class="facetview_filterselected facetview_facetrange facetview_clear \
-                btn btn-info" rel="' + rel + 
+                btn btn-info" rel="' + rel +
                 '" alt="remove" title="remove"' +
                 ' href="' + $(this).attr("href") + '">' +
                 range + ' <i class="icon-white icon-remove"></i></a></div>';
@@ -687,7 +687,7 @@ search box - the end user will not know they are happening.
             if ( $('.facetview_or[href="' + rel + '"]', obj).attr('rel') == 'OR' ) {
                 newobj += ' facetview_logic_or';
             }
-            newobj += '" rel="' + rel + 
+            newobj += '" rel="' + rel +
                 '" alt="remove" title="remove"' +
                 ' href="' + href + '">' +
                 href + ' <i class="icon-white icon-remove" style="margin-top:1px;"></i></a>';
@@ -718,7 +718,7 @@ search box - the end user will not know they are happening.
             }
             dosearch();
         };
-        
+
         // ===============================================
         // functions to do with building results
         // ===============================================
@@ -835,7 +835,7 @@ search box - the end user will not know they are happening.
                         } else {
                             line += thevalue;
                         }
-                        display[lineitem][object]['post'] 
+                        display[lineitem][object]['post']
                             ? line += display[lineitem][object]['post'] : line += ' ';
                     }
                 }
@@ -853,7 +853,7 @@ search box - the end user will not know they are happening.
             event.preventDefault();
             var record = options.data['records'][$(this).attr('href')];
             alert(JSON.stringify(record,"","    "));
-            
+
         }
 
         // put the results on the page
@@ -862,7 +862,7 @@ search box - the end user will not know they are happening.
             // get the data and parse from the es layout
             var data = parseresults(sdata);
             options.data = data;
-            
+
             // for each filter setup, find the results for it and append them to the relevant filter
             for ( var each = 0; each < options.facets.length; each++ ) {
                 var facet = options.facets[each]['field'];
@@ -981,6 +981,157 @@ search box - the end user will not know they are happening.
             return rqs;
         };
 
+         // build the search query URL based on current params
+        var ldfsearchquery = function() {
+            var qs = {};
+            var bool = false;
+            var nested = false;
+            var seenor = []; // track when an or group are found and processed
+            $('.facetview_filterselected',obj).each(function() {
+                !bool ? bool = {'must': [] } : "";
+                if ( $(this).hasClass('facetview_facetrange') ) {
+                    var rngs = {
+                        'from': $('.facetview_lowrangeval_' + $(this).attr('rel'), this).html(),
+                        'to': $('.facetview_highrangeval_' + $(this).attr('rel'), this).html()
+                    };
+                    var rel = options.facets[ $(this).attr('rel') ]['field'];
+                    var robj = {'range': {}};
+                    robj['range'][ rel ] = rngs;
+                    // check if this should be a nested query
+                    var parts = rel.split('.');
+                    if ( options.nested.indexOf(parts[0]) != -1 ) {
+                        !nested ? nested = {"nested":{"_scope":parts[0],"path":parts[0],"query":{"bool":{"must":[robj]}}}} : nested.nested.query.bool.must.push(robj);
+                    } else {
+                        bool['must'].push(robj);
+                    }
+                } else {
+                    // TODO: check if this has class facetview_logic_or
+                    // if so, need to build a should around it and its siblings
+                    if ( $(this).hasClass('facetview_logic_or') ) {
+                        if ( !($(this).attr('rel') in seenor) ) {
+                            seenor.push($(this).attr('rel'));
+                            var bobj = {'bool':{'should':[]}};
+                            $('.facetview_filterselected[rel="' + $(this).attr('rel') + '"]').each(function() {
+                                if ( $(this).hasClass('facetview_logic_or') ) {
+                                    var ob = {'term':{}};
+                                    ob['term'][ $(this).attr('rel') ] = $(this).attr('href');
+                                    bobj.bool.should.push(ob);
+                                };
+                            });
+                            if ( bobj.bool.should.length == 1 ) {
+                                var spacer = {'match_all':{}};
+                                bobj.bool.should.push(spacer);
+                            }
+                        }
+                    } else {
+                        var rel = $(this).attr('rel');
+                        var facet = options.facets.filter(function(f) {
+                            return f['field'] === rel && f['facet_filter'];
+                        })[0];
+                        var bobj = {'term':{}};
+                        bobj['term'][rel] = $(this).attr('href');
+                        if (facet) {
+                            qs['filter'] = facet['facet_filter'];
+                        }
+                    }
+
+                    // check if this should be a nested query
+                    var parts = $(this).attr('rel').split('.');
+                    if ( options.nested.indexOf(parts[0]) != -1 ) {
+                        !nested ? nested = {"nested":{"_scope":parts[0],"path":parts[0],"query":{"bool":{"must":[bobj]}}}} : nested.nested.query.bool.must.push(bobj);
+                    } else {
+                        bool['must'].push(bobj);
+                    }
+                }
+            });
+            for (var item in options.predefined_filters) {
+                !bool ? bool = {'must': [] } : "";
+                var pobj = options.predefined_filters[item];
+                var parts = item.split('.');
+                if ( options.nested.indexOf(parts[0]) != -1 ) {
+                    !nested ? nested = {"nested":{"_scope":parts[0],"path":parts[0],"query":{"bool":{"must":[pobj]}}}} : nested.nested.query.bool.must.push(pobj);
+                } else {
+                    bool['must'].push(pobj);
+                }
+            }
+            if (bool) {
+                if ( options.q != "" ) {
+                    var qryval = { 'query': fuzzify(options.q) };
+                    $('.facetview_searchfield', obj).val() != "" ? qryval.default_field = $('.facetview_searchfield', obj).val() : "";
+                    options.default_operator !== undefined ? qryval.default_operator = options.default_operator : false;
+                    bool['must'].push( {'query_string': qryval } );
+                };
+                nested ? bool['must'].push(nested) : "";
+                qs['query'] = {'bool': bool};
+            } else {
+                if ( options.q != "" ) {
+                    var qryval = { 'query': fuzzify(options.q) };
+                    $('.facetview_searchfield', obj).val() != "" ? qryval.default_field = $('.facetview_searchfield', obj).val() : "";
+                    options.default_operator !== undefined ? qryval.default_operator = options.default_operator : false;
+                    qs['query'] = {'query_string': qryval };
+                } else {
+                    qs['query'] = {'match_all': {}};
+                };
+            };
+            // set any paging
+            options.paging.from != 0 ? qs['from'] = options.paging.from : "";
+            options.paging.size != 10 ? qs['size'] = options.paging.size : "";
+            // set any sort or fields options
+            options.sort.length > 0 ? qs['sort'] = options.sort : "";
+            options.fields ? qs['fields'] = options.fields : "";
+            options.partial_fields ? qs['partial_fields'] = options.partial_fields : "";
+            // set any facets
+            qs['facets'] = {};
+            for ( var item = 0; item < options.facets.length; item++ ) {
+                var fobj = jQuery.extend(true, {}, options.facets[item] );
+                var facet_filter = fobj['facet_filter'];
+                delete fobj['display'];
+                delete fobj['facet_filter'];
+                var facet = {'terms': fobj};
+                if (facet_filter || qs['filter']) {
+                    facet['facet_filter'] = {'and': []};
+                    if (facet_filter) {
+                        facet['facet_filter']['and'].push(facet_filter);
+                    }
+                    if (qs['filter']) {
+                        facet['facet_filter']['and'].push(qs['filter']);
+                    }
+                }
+                var parts = fobj['field'].split('.');
+                qs['facets'][fobj['field']] = facet;
+                for (var ni; ni < options.nested.length; ni++ ) {
+                    if (fobj['field'].indexOf(options.nested[i]) == 0) {
+                         nested ? qs['facets'][fobj['field']]["scope"] = options.nested[i] : qs['facets'][fobj['field']]["nested"] = options.nested[i];
+                    }
+                }
+            }
+            jQuery.extend(true, qs['facets'], options.extra_facets );
+            // set elasticsearch filter, if any
+            // set any filter
+            if (options.filter) {
+                qs['filter'] = options.filter;
+            }
+            console.log(JSON.stringify(qs,"","    "));
+
+            if ( options.include_facets_in_querystring ) {
+            } else {
+                delete qs.facets;
+            }
+
+            //qy = JSON.stringify(qs);
+            qy = "select * where \{";
+            $.each(qs.query.bool.must, function(key, query_part) {
+              $.each(query_part.term, function(key, obj) {
+                qy += "?s " + key + " " + obj +" .";
+              });
+            });
+            qy += "\}";
+            console.log(qy);
+            options.querystring = qy;
+            options.sharesave_link ? $('.facetview_sharesaveurl', obj).val('http://' + window.location.host + window.location.pathname + '?source=' + options.querystring) : "";
+            return qy;
+        };
+
         // build the search query URL based on current params
         var elasticsearchquery = function() {
             var qs = {};
@@ -1034,7 +1185,7 @@ search box - the end user will not know they are happening.
                             qs['filter'] = facet['facet_filter'];
                         }
                     }
-                    
+
                     // check if this should be a nested query
                     var parts = $(this).attr('rel').split('.');
                     if ( options.nested.indexOf(parts[0]) != -1 ) {
@@ -1133,7 +1284,7 @@ search box - the end user will not know they are happening.
                 options.q = $(options.searchbox_class).last().val();
             };
             // make the search query
-            var qrystr = elasticsearchquery();
+            var qrystr = ldfsearchquery();
             // augment the URL bar if possible
             if ( options.pushstate ) {
                 var currurl = '?source=' + options.querystring;
@@ -1158,7 +1309,7 @@ search box - the end user will not know they are happening.
         // adjust how many results are shown
         var howmany = function(event) {
             event.preventDefault();
-            var newhowmany = prompt('Currently displaying ' + options.paging.size + 
+            var newhowmany = prompt('Currently displaying ' + options.paging.size +
                 ' results per page. How many would you like instead?');
             if (newhowmany) {
                 options.paging.size = parseInt(newhowmany);
@@ -1167,7 +1318,7 @@ search box - the end user will not know they are happening.
                 dosearch();
             }
         };
-        
+
         // change the search result order
         var order = function(event) {
             event.preventDefault();
@@ -1196,7 +1347,7 @@ search box - the end user will not know they are happening.
             options.paging.from = 0;
             dosearch();
         };
-        
+
         // parse any source params out for an initial search
         var parsesource = function() {
             var qrystr = options.source.query;
@@ -1227,13 +1378,13 @@ search box - the end user will not know they are happening.
                 typeof(qrystr.query_string.query) == 'string' ? options.q = qrystr.query_string.query : "";
             };
         }
-        
+
         // show the current url with the result set as the source param
         var sharesave = function(event) {
             event.preventDefault();
             $('.facetview_sharesavebox', obj).toggle();
         };
-        
+
         // adjust the search field focus
         var searchfield = function(event) {
             event.preventDefault();
@@ -1278,7 +1429,7 @@ search box - the end user will not know they are happening.
             }
         };
         thehelp += '<p><a class="facetview_learnmore label" href="#">close the help</a></p></div>';
-        
+
         // the facet view object to be appended to the page
         var thefacetview = '<div id="facetview"><div class="row-fluid">';
         if ( options.facets.length > 0 ) {
@@ -1324,7 +1475,7 @@ search box - the end user will not know they are happening.
             thefacetview += '<div class="facetview_sharesavebox alert alert-info" style="display:none;"> \
                 <button type="button" class="facetview_sharesave close">×</button> \
                 <p>Share or save this search:</p> \
-                <textarea class="facetview_sharesaveurl" style="width:100%;height:100px;">http://' + window.location.host + 
+                <textarea class="facetview_sharesaveurl" style="width:100%;height:100px;">http://' + window.location.host +
                 window.location.pathname + '?source=' + options.querystring + '</textarea> \
                 </div>';
         }
@@ -1342,7 +1493,7 @@ search box - the end user will not know they are happening.
         return this.each(function() {
             // get this object
             obj = $(this);
-            
+
             // what to do when ready to go
             var whenready = function() {
                 // append the facetview object to this object
@@ -1383,7 +1534,7 @@ search box - the end user will not know they are happening.
                 options.source || options.initialsearch ? dosearch() : "";
 
             };
-            
+
             // check for remote config options, then do first search
             if (options.config_file) {
                 $.ajax({
@@ -1412,7 +1563,7 @@ search box - the end user will not know they are happening.
                 whenready();
             }
 
-        }); // end of the function  
+        }); // end of the function
 
 
     };
@@ -1421,5 +1572,5 @@ search box - the end user will not know they are happening.
     // facetview options are declared as a function so that they can be retrieved
     // externally (which allows for saving them remotely etc)
     $.fn.facetview.options = {};
-    
+
 })(jQuery);
