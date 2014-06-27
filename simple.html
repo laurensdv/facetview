@@ -26,28 +26,29 @@
 
   <script type="text/javascript">
 jQuery(document).ready(function($, Q) {
+      var callback = function (target) {
+      console.log("received callback");
+      console.log(target);
+  };
+    var ldfClientUi = new LinkedDataFragmentsClientUI("#overview", "SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
+  ldfClientUi.activate();
   $('.facet-view-simple').facetview({
-    search_url: 'http://bibsoup.net/query?',
+    search_url: '',
     search_index: 'ldf',
     facets: [
-        {'field': 'publisher.exact', 'size': 100, 'order':'term', 'display': 'publisher'},
-        {'field': 'author.name.exact', 'display': 'author'},
-        {'field': 'year.exact', 'display': 'year'},
-        {'field': 'collection.exact', 'display': 'collection'},
+        {'field': ':publisher', 'size': 100, 'order':'term', 'display': 'publisher'},
+        {'field': ':author', 'display': 'author'},
+        {'field': ':year', 'display': 'year'},
+        {'field': ':collection', 'display': 'collection'},
     ],
     paging: {
       size: 10
     },
     predefined_filters: {
-        'owner.exact': {'term':{'owner.exact':'test'}}
+        'owner.exact': {'term':{':owner':'test'}}
     }
   });
-  var targetObj = [];
-  var callback = function () {
-      console.log("received callback");
-  };
-  var ldfClientUi = new LinkedDataFragmentsClientUI("#overview",targetObj,"SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
-  ldfClientUi.activate();
+
 });
   </script>
 

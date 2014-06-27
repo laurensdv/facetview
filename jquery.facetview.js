@@ -448,6 +448,11 @@ search box - the end user will not know they are happening.
         $.fn.facetview.options = $.extend(provided_options,url_options);
         var options = $.fn.facetview.options;
 
+        var is_valid_url = function (url)
+        {
+           return url.match(/^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/);
+        }
+
 
         // ===============================================
         // functions to do with filters
@@ -860,8 +865,8 @@ search box - the end user will not know they are happening.
         var showresults = function(sdata) {
             options.rawdata = sdata;
             // get the data and parse from the es layout
-            var data = parseresults(sdata);
-            options.data = data;
+            //var data = parseresults(sdata);
+            //options.data = data;
 
             // for each filter setup, find the results for it and append them to the relevant filter
             for ( var each = 0; each < options.facets.length; each++ ) {
@@ -1119,13 +1124,17 @@ search box - the end user will not know they are happening.
             }
 
             //qy = JSON.stringify(qs);
-            qy = "select * where \{";
+            qy = "select * where \{ ";
             $.each(qs.query.bool.must, function(key, query_part) {
               $.each(query_part.term, function(key, obj) {
-                qy += "?s " + key + " " + obj +" .";
+                if(is_valid_url(obj)) {
+                  qy += " ?s " + key + " <" + obj +"> . ";
+                } else {
+                  qy += " ?s " + key + " \"" + obj +"\" . ";
+                }
               });
             });
-            qy += "\}";
+            qy += " \}";
             console.log(qy);
             options.querystring = qy;
             options.sharesave_link ? $('.facetview_sharesaveurl', obj).val('http://' + window.location.host + window.location.pathname + '?source=' + options.querystring) : "";
@@ -1290,14 +1299,9 @@ search box - the end user will not know they are happening.
                 var currurl = '?source=' + options.querystring;
                 window.history.pushState("","search",currurl);
             };
-            $.ajax({
-                type: "get",
-                url: options.search_url,
-                data: {source: qrystr},
-                // processData: false,
-                dataType: options.datatype,
-                success: showresults
-            });
+            console.log(qrystr);
+            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr ,"http://data.linkeddatafragments.org/dbpedia", showresults);
+            ldfClientUi.activate();
         };
 
         // show search help
@@ -1350,33 +1354,35 @@ search box - the end user will not know they are happening.
 
         // parse any source params out for an initial search
         var parsesource = function() {
-            var qrystr = options.source.query;
-            if ( 'bool' in qrystr ) {
-                var qrys = [];
-                // TODO: check for nested
-                if ( 'must' in qrystr.bool ) {
-                    qrys = qrystr.bool.must;
-                } else if ( 'should' in qrystr.bool ) {
-                    qrys = qrystr.bool.should;
-                };
-                for ( var qry = 0; qry < qrys.length; qry++ ) {
-                    for ( var key in qrys[qry] ) {
-                        if ( key == 'term' ) {
-                            for ( var t in qrys[qry][key] ) {
-                                if ( !(t in options.predefined_filters) ) {
-                                    clickfilterchoice(false,t,qrys[qry][key][t]);
-                                };
-                            };
-                        } else if ( key == 'query_string' ) {
-                            typeof(qrys[qry][key]['query']) == 'string' ? options.q = qrys[qry][key]['query'] : "";
-                        } else if ( key == 'bool' ) {
-                            // TODO: handle sub-bools
-                        };
-                    };
-                };
-            } else if ( 'query_string' in qrystr ) {
-                typeof(qrystr.query_string.query) == 'string' ? options.q = qrystr.query_string.query : "";
-            };
+            //var qrystr = options.source.query;
+            //if ( 'bool' in qrystr ) {
+            //    var qrys = [];
+            //    // TODO: check for nested
+            //    if ( 'must' in qrystr.bool ) {
+            //        qrys = qrystr.bool.must;
+            //   } else if ( 'should' in qrystr.bool ) {
+            //        qrys = qrystr.bool.should;
+            //    };
+            //    for ( var qry = 0; qry < qrys.length; qry++ ) {
+            //        for ( var key in qrys[qry] ) {
+            //            if ( key == 'term' ) {
+            //                for ( var t in qrys[qry][key] ) {
+            //                    if ( !(t in options.predefined_filters) ) {
+            //                        clickfilterchoice(false,t,qrys[qry][key][t]);
+            //                    };
+            //                };
+            //            } else if ( key == 'query_string' ) {
+            //                typeof(qrys[qry][key]['query']) == 'string' ? options.q = qrys[qry][key]['query'] : "";
+            //            } else if ( key == 'bool' ) {
+            //                // TODO: handle sub-bools
+            //            };
+            //        };
+            //    };
+            //} else if ( 'query_string' in qrystr ) {
+            //    typeof(qrystr.query_string.query) == 'string' ? options.q = qrystr.query_string.query : "";
+            //};
+            var qrystr = options.source;
+            options.q = qrystr;
         }
 
         // show the current url with the result set as the source param
@@ -1515,10 +1521,10 @@ search box - the end user will not know they are happening.
                 !options.paging.from ? options.paging.from = 0 : "";
 
                 // handle any source options
-                if ( options.source ) {
-                    parsesource();
-                    delete options.source;
-                }
+                //if ( options.source ) {
+                //    parsesource();
+                //    delete options.source;
+                //}
 
                 // set any default search values into the search bar and create any required filters
                 if ( options.searchbox_class.length == 0 ) {

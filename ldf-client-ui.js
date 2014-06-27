@@ -9,10 +9,9 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
       N3 = require('n3');
 
   // Creates a new Linked Data Fragments Client UI
-  function LinkedDataFragmentsClientUI(element, target, query, startFragment, callback) {
+  function LinkedDataFragmentsClientUI(element, query, startFragment, callback) {
     this.query = query;
     this._$element = $(element);
-    this._target = target;
     this._callback = callback;
     this.config = {};
     this.config.startFragment = startFragment;
@@ -41,7 +40,6 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
       var query = this.query;
       var startFragment = this.startFragment;
       var config = this.config;
-      var target = this._target;
       var callback = this._callback;
       var $results = this._$element.find('.results');
 
@@ -76,10 +74,12 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
       }
       sparqlIterator.on('end', function () {
           var resultString = $results.text();
-          target = JSON.parse(resultString);
           console.log('done');
-          console.log(target);
-          callback();
+          if(resultString == "") {
+              callback({});
+          } else {
+              callback(JSON.parse(resultString));
+          }
       });
       sparqlIterator.on('error', function (error) { console.log(error.message); throw error; });
       sparqlIterator.read();
