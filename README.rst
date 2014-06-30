@@ -1,3 +1,10 @@
+FacetView LDF Mod
+==================
+
+
+Original Documentation
+======================
+
 FacetView_ is a pure javascript frontend for ElasticSearch search
 indices.
 
@@ -12,14 +19,14 @@ Development is now taking place in this repo: http://github.com/okfn/facetview
 
 
 Demo
-====
+----
 
 See http://okfnlabs.org/facetview/ or if you have the source just take a look 
 at index.html or simple.html
 
 
 Status
-======
+-------
 
 FacetView is pretty new, and still under active development but is already
 pretty stable. If you have suggestions or want to make a contribution please
@@ -27,7 +34,7 @@ check out the github repo.
 
 
 Using FacetView
-===============
+---------------
 
 Add the following code to your web page::
 
@@ -73,13 +80,12 @@ get it looking the way you want it.
 
 
 Customization
-=============
+-------------
 
 Once you have FacetView all ready to go, you should probably do some
 customisation. There are a few ways to do this:
 
-Edit the config in jquery.facetview.js
---------------------------------------
+### Edit the config in jquery.facetview.js
 
 View the config options near the top of the file to learn more. Some 
 important points:
@@ -101,8 +107,7 @@ important points:
   to every search. For example, customise a facetview display to only show 
   records with a particular owner / collection / tag / whatever
 
-Pass in config settings when calling FacetView
-----------------------------------------------
+### Pass in config settings when calling FacetView
 
 All of the settings can also be defined when calling FacetView, and will
 overwrite the values set in the file itself. So you can do something like
@@ -117,15 +122,13 @@ this::
   });
   </script>
 
-Passing config parameters in the URL
-------------------------------------
+### Passing config parameters in the URL
 
 Configs can be passed on the URL as query parameters. For example, 
 ?q=blah will set the starting search to "blah". You can add complex 
 queries as JSON objects, such as ?paging={"size":20,"from":10}. Nice...
 
-Providing the location of an external config file
--------------------------------------------------
+### Providing the location of an external config file
 
 A file can be made available anywhere on the web (depending, keep reading) 
 with any of the above listed settings in it (written in the usual way for a 
@@ -143,8 +146,7 @@ normally readable to a GET request - e.g. it should have a .html extension, or
 be otherwise set up to return your config as a string to the GET request. The 
 JSON config object is then parsed and read in.
 
-Config precedence
------------------
+### Config precedence
 
 When you introduce a new config object, they are merged into earlier configs with 
 overwrite. So any config you specify in facetview.jquery.js will be overwritten 
@@ -153,8 +155,7 @@ which is overwritten by config parameters passed in the URL,
 and a call to a remote config file will similarly overwrite and append to all 
 previous.
 
-Change the layout by making and using a custom CSS file
--------------------------------------------------------
+### Change the layout by making and using a custom CSS file
 
 Facetview uses the latest `twitter bootstrap`_. When you embed facetview in a page, 
 you need to include the calls to bootstrap js and css files (see the example 
@@ -164,9 +165,12 @@ bootstrap out; recommend working with or around it.
 
 
 Copyright and License
-=====================
+----------------------
 
-Copyright 2011 Open Knowledge Foundation and Cottage Labs.
+
+Originally Copyright 2011-2013 Open Knowledge Foundation and Cottage Labs.
+
+Mod Copyright 2014 Ghent University - iMinds, Multimedia Lab
 
 Licensed under the `MIT License`_
 
