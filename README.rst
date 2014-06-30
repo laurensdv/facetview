@@ -1,9 +1,12 @@
 FacetView LDF Mod
 ==================
 
+This is a mod for FacetView running on top of LDF.
+
+Enables semantic faceted search for any LDF endpoint.
 
 Original Documentation
-======================
+----------------------
 
 FacetView_ is a pure javascript frontend for ElasticSearch search
 indices.
