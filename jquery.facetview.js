@@ -342,51 +342,16 @@ search box - the end user will not know they are happening.
         var resdisplay = [
                 [
                     {
-                        "field": "author.name"
-                    },
-                    {
-                        "pre": "(",
-                        "field": "year",
-                        "post": ")"
-                    }
-                ],
-                [
-                    {
                         "pre": "<strong>",
-                        "field": "title",
+                        "field": "?l",
                         "post": "</strong>"
                     }
                 ],
                 [
                     {
-                        "field": "howpublished"
-                    },
-                    {
-                        "pre": "in <em>",
-                        "field": "journal.name",
-                        "post": "</em>,"
-                    },
-                    {
-                        "pre": "<em>",
-                        "field": "booktitle",
-                        "post": "</em>,"
-                    },
-                    {
-                        "pre": "vol. ",
-                        "field": "volume",
-                        "post": ","
-                    },
-                    {
-                        "pre": "p. ",
-                        "field": "pages"
-                    },
-                    {
-                        "field": "publisher"
-                    }
-                ],
-                [
-                    {
-                        "field": "link.url"
+                      "pre": '<a href="',
+                      "field": "?s",
+                      "post": '">More information</a>'
                     }
                 ]
             ];
@@ -433,7 +398,7 @@ search box - the end user will not know they are happening.
             "fadein":800,
             "post_search_callback": false,
             "pushstate": true,
-            "linkify": true,
+            "linkify": false,
             "default_operator": "OR",
             "default_freetext_fuzzify": false
         };
@@ -450,7 +415,7 @@ search box - the end user will not know they are happening.
 
         var is_valid_url = function (url)
         {
-           return url.match(/^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/);
+           return url.match("([A-Za-z][A-Za-z0-9+\\-.]*):(?:(//)(?:((?:[A-Za-z0-9\\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*)@)?((?:\\[(?:(?:(?:(?:[0-9A-Fa-f]{1,4}:){6}|::(?:[0-9A-Fa-f]{1,4}:){5}|(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,1}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){3}|(?:(?:[0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){2}|(?:(?:[0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}:|(?:(?:[0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})?::)(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(?:(?:[0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})?::)|[Vv][0-9A-Fa-f]+\\.[A-Za-z0-9\\-._~!$&'()*+,;=:]+)\\]|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:[A-Za-z0-9\\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*))(?::([0-9]*))?((?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)|/((?:(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)?)|((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)|)(?:\\?((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*))?(?:\\#((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*))?");
         }
 
 
@@ -728,37 +693,62 @@ search box - the end user will not know they are happening.
         // functions to do with building results
         // ===============================================
 
+
+
+
         // read the result object and return useful vals
         // returns an object that contains things like ["data"] and ["facets"]
         var parseresults = function(dataobj) {
-            var resultobj = new Object();
-            resultobj["records"] = new Array();
+            var deferred = Q.defer();
+            var resultobj = {};
+            resultobj["records"] = [];
             resultobj["start"] = "";
             resultobj["found"] = "";
-            resultobj["facets"] = new Object();
-            for ( var item = 0; item < dataobj.hits.hits.length; item++ ) {
-                if ( options.fields ) {
-                    resultobj["records"].push(dataobj.hits.hits[item].fields);
-                } else if ( options.partial_fields ) {
-                    var keys = [];
-                    for(var key in options.partial_fields){
-                        keys.push(key);
-                    }
-                    resultobj["records"].push(dataobj.hits.hits[item].fields[keys[0]]);
-                } else {
-                    resultobj["records"].push(dataobj.hits.hits[item]._source);
-                }
+            resultobj["facets"] = {};
+            var counts = [];
+            var deferredF = [];
+
+            var setfacetcounts = function(pattern, metadata) {
+              if (pattern.predicate in resultobj["facets"]) {
+                resultobj["facets"][pattern.predicate][pattern.object] = metadata.totalTriples;
+              } else {
+                resultobj["facets"][pattern.predicate] = new Object();
+                resultobj["facets"][pattern.predicate][pattern.object] = metadata.totalTriples;
+              }
+            };
+
+
+            var countoccurrences = function(data, facet) {
+              for ( var item = 0; item < data.length; item++ ) {
+                var facet_uri = facet;
+                var facet_instance =  data[item]["?o"];
+                var ldfF = new LinkedDataFragmentsClientFacets("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
+                counts.push(ldfF.activate());
+              }
+            };
+
+
+            for ( var item = 0; item < dataobj.length; item++ ) {
+                resultobj["records"].push(dataobj[item]);
             }
-            resultobj["start"] = "";
-            resultobj["found"] = dataobj.hits.total;
-            for (var item in dataobj.facets) {
-                var facetsobj = new Object();
-                for (var thing = 0; thing < dataobj.facets[item]["terms"].length; thing++) {
-                    facetsobj[ dataobj.facets[item]["terms"][thing]["term"] ] = dataobj.facets[item]["terms"][thing]["count"];
-                }
-                resultobj["facets"][item] = facetsobj;
+
+            resultobj["start"] = options.paging.from;
+            resultobj["found"] = dataobj.length + options.paging.from + 1;
+
+
+            for (var item in options.facets) {
+                var query = generateSPARQL(options.last_qs, options.facets[item]);
+                var ldfQ = new LinkedDataFragmentsClientUI(null, query, options.search_url, countoccurrences, options.facets[item].field);
+                deferredF.push(ldfQ.activate());
             }
-            return resultobj;
+
+            Q.when(Q.all(deferredF), function () {
+             Q.when(Q.all(counts), function() {
+               deferred.resolve(resultobj);
+             });
+            });
+
+            return deferred.promise;
         };
 
         // decrement result set
@@ -862,12 +852,14 @@ search box - the end user will not know they are happening.
         }
 
         // put the results on the page
-        var showresults = function(sdata) {
+        var showresults = function(sdata, other) {
             options.rawdata = sdata;
             // get the data and parse from the es layout
             //var data = parseresults(sdata);
             //options.data = data;
 
+            Q.when(parseresults(sdata), function(data) {
+            options.data = data;
             // for each filter setup, find the results for it and append them to the relevant filter
             for ( var each = 0; each < options.facets.length; each++ ) {
                 var facet = options.facets[each]['field'];
@@ -938,11 +930,12 @@ search box - the end user will not know they are happening.
             // put the filtered results on the page
             $('#facetview_results',obj).html("");
             var infofiltervals = new Array();
-            $.each(data.records, function(index, value) {
+            var records_size = data.records.length;
+            for(var index = 0; index < data.records.length; index++) {
                 // write them out to the results div
                  $('#facetview_results', obj).append( buildrecord(index) );
                  options.linkify ? $('#facetview_results tr:last-child', obj).linkify() : false;
-            });
+            };
             if ( options.result_box_colours.length > 0 ) {
                 jQuery('.result_box', obj).each(function () {
                     var colour = options.result_box_colours[Math.floor(Math.random()*options.result_box_colours.length)] ;
@@ -956,6 +949,8 @@ search box - the end user will not know they are happening.
             if (typeof options.post_search_callback == 'function') {
                 options.post_search_callback.call(this);
             }
+          });
+
         };
 
         // ===============================================
@@ -985,6 +980,42 @@ search box - the end user will not know they are happening.
             };
             return rqs;
         };
+
+        var generateSPARQL = function(qs, extra) {
+            if(extra.field.length > 0) {
+              qy = "select ?o where \{ ";
+            } else {
+              qy = "select * where \{ ";
+            }
+            var count = 0;
+            $.each(qs.query.bool.must, function(key, query_part) {
+              $.each(query_part.term, function(key, obj) {
+                if(is_valid_url(obj)) {
+                  if(obj.indexOf('/') >= 0) {
+                       qy += " ?s" + " " + key + " <" + obj + "> . ";
+                    } else {
+                       qy += " ?s" + " "+ key + " "  + obj + " . ";
+                    }
+                } else {
+                  qy += " ?s" + " " + key + " \"" + obj +"\" . ";
+                }
+                qy += " ?s" + " rdfs:label ?l" + " . ";
+              });
+            });
+            if(extra.field.length > 0) {
+              qy += " ?s " + extra.field + " ?o" + " . ";
+              //qy += " ?o " + "rdfs:label ?lo" + " . ";
+            }
+            qy += " \} ";
+            if(extra.field.length === 0) {
+               qy += " LIMIT " + options.paging.size;
+               qy += " OFFSET " + options.paging.from;
+            } else {
+               qy += " GROUP BY ?o LIMIT " + extra.size;
+            }
+            console.log(qy);
+            return qy
+        }
 
          // build the search query URL based on current params
         var ldfsearchquery = function() {
@@ -1124,22 +1155,15 @@ search box - the end user will not know they are happening.
             }
 
             //qy = JSON.stringify(qs);
-            qy = "select * where \{ ";
-            $.each(qs.query.bool.must, function(key, query_part) {
-              $.each(query_part.term, function(key, obj) {
-                if(is_valid_url(obj)) {
-                  qy += " ?s " + key + " <" + obj +"> . ";
-                } else {
-                  qy += " ?s " + key + " \"" + obj +"\" . ";
-                }
-              });
-            });
-            qy += " \}";
-            console.log(qy);
-            options.querystring = qy;
+          qy = generateSPARQL(qs, {field : ""});
+            //options.querystring = qy;
+            options.last_qs = qs;
+            options.querystring = JSON.stringify(qs);
             options.sharesave_link ? $('.facetview_sharesaveurl', obj).val('http://' + window.location.host + window.location.pathname + '?source=' + options.querystring) : "";
             return qy;
         };
+
+
 
         // build the search query URL based on current params
         var elasticsearchquery = function() {
@@ -1300,7 +1324,7 @@ search box - the end user will not know they are happening.
                 window.history.pushState("","search",currurl);
             };
             console.log(qrystr);
-            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr ,"http://data.linkeddatafragments.org/dbpedia", showresults);
+            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr , options.search_url, showresults, null);
             ldfClientUi.activate();
         };
 
@@ -1354,35 +1378,35 @@ search box - the end user will not know they are happening.
 
         // parse any source params out for an initial search
         var parsesource = function() {
-            //var qrystr = options.source.query;
-            //if ( 'bool' in qrystr ) {
-            //    var qrys = [];
-            //    // TODO: check for nested
-            //    if ( 'must' in qrystr.bool ) {
-            //        qrys = qrystr.bool.must;
-            //   } else if ( 'should' in qrystr.bool ) {
-            //        qrys = qrystr.bool.should;
-            //    };
-            //    for ( var qry = 0; qry < qrys.length; qry++ ) {
-            //        for ( var key in qrys[qry] ) {
-            //            if ( key == 'term' ) {
-            //                for ( var t in qrys[qry][key] ) {
-            //                    if ( !(t in options.predefined_filters) ) {
-            //                        clickfilterchoice(false,t,qrys[qry][key][t]);
-            //                    };
-            //                };
-            //            } else if ( key == 'query_string' ) {
-            //                typeof(qrys[qry][key]['query']) == 'string' ? options.q = qrys[qry][key]['query'] : "";
-            //            } else if ( key == 'bool' ) {
-            //                // TODO: handle sub-bools
-            //            };
-            //        };
-            //    };
-            //} else if ( 'query_string' in qrystr ) {
-            //    typeof(qrystr.query_string.query) == 'string' ? options.q = qrystr.query_string.query : "";
-            //};
-            var qrystr = options.source;
-            options.q = qrystr;
+            var qrystr = options.source.query;
+            if ( 'bool' in qrystr ) {
+                var qrys = [];
+                // TODO: check for nested
+                if ( 'must' in qrystr.bool ) {
+                    qrys = qrystr.bool.must;
+               } else if ( 'should' in qrystr.bool ) {
+                    qrys = qrystr.bool.should;
+                };
+                for ( var qry = 0; qry < qrys.length; qry++ ) {
+                    for ( var key in qrys[qry] ) {
+                        if ( key == 'term' ) {
+                            for ( var t in qrys[qry][key] ) {
+                                if ( !(t in options.predefined_filters) ) {
+                                    clickfilterchoice(false,t,qrys[qry][key][t]);
+                                };
+                            };
+                        } else if ( key == 'query_string' ) {
+                            typeof(qrys[qry][key]['query']) == 'string' ? options.q = qrys[qry][key]['query'] : "";
+                        } else if ( key == 'bool' ) {
+                            // TODO: handle sub-bools
+                        };
+                    };
+                };
+            } else if ( 'query_string' in qrystr ) {
+                typeof(qrystr.query_string.query) == 'string' ? options.q = qrystr.query_string.query : "";
+            };
+            //var qrystr = options.source;
+            //options.q = qrystr;
         }
 
         // show the current url with the result set as the source param

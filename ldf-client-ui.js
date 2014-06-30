@@ -1,7 +1,7 @@
 /*! @license Â©2013 Ruben Verborgh - Multimedia Lab / iMinds / Ghent University */
 /** Browser interface for the LDF client. */
 
-var LinkedDataFragmentsClientUI = (function ($, Q) {
+var LinkedDataFragmentsClientUI = (function ($) {
   var ldf = require('ldf-client'),
       SparqlIterator = ldf.SparqlIterator,
       FragmentsClient = ldf.FragmentsClient,
@@ -9,11 +9,13 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
       N3 = require('n3');
 
   // Creates a new Linked Data Fragments Client UI
-  function LinkedDataFragmentsClientUI(element, query, startFragment, callback) {
+  function LinkedDataFragmentsClientUI(element, query, startFragment, callback, facet) {
     this.query = query;
     this._$element = $(element);
     this._callback = callback;
+    this._facet = facet;
     this.config = {};
+    this.resultsString = "";
     this.config.startFragment = startFragment;
     this.config.prefixes = {
      "rdf":         "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -28,7 +30,7 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
      "geo":         "http://www.w3.org/2003/01/geo/wgs84_pos#",
      "dbpedia":     "http://dbpedia.org/resource/",
      "dbpedia-owl": "http://dbpedia.org/ontology/",
-     "dbpprop":     "http://dbpedia.org/property/"
+     "dbpprop":     "http://dbpedia.org/property/",
     };
 
 
@@ -37,12 +39,16 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
 
   // Activates the Linked Data Fragments Client UI
   LinkedDataFragmentsClientUI.prototype.activate = function () {
+      var deferred = Q.defer();
       var query = this.query;
       var startFragment = this.startFragment;
       var config = this.config;
       var callback = this._callback;
+      var resultString = this.resultsString;
       var $results = this._$element.find('.results');
+      var facet = this._facet;
 
+      resultString = "";
       $results.empty();
 
       console.log("activated new client");
@@ -55,7 +61,7 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
           var resultsCount = 0;
           addToResults('[');
           sparqlIterator.on('data', function (row) {
-            addToResults(resultsCount++ ? ',\n' : '\n', row);
+          addToResults(resultsCount++ ? ',\n' : '\n', row);
           });
           sparqlIterator.on('end', function () {
             addToResults(resultsCount ? '\n]' : ']');
@@ -73,12 +79,15 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
           throw new Error('Unsupported query type: ' + sparqlIterator.parsedQuery.type);
       }
       sparqlIterator.on('end', function () {
-          var resultString = $results.text();
           console.log('done');
           if(resultString == "") {
-              callback({});
+              callback({}, null);
+              deferred.resolve();
           } else {
-              callback(JSON.parse(resultString));
+              resultString = resultString.replace('\n]\n]', '\n]');
+              var resultObj = JSON.parse(resultString);
+              callback(resultObj, facet);
+              deferred.resolve();
           }
       });
       sparqlIterator.on('error', function (error) { console.log(error.message); throw error; });
@@ -92,10 +101,13 @@ var LinkedDataFragmentsClientUI = (function ($, Q) {
         if (typeof item !== 'string')
           item = JSON.stringify(item, null, '  ');
         console.log(item);
+        resultString += item;
         $results.append(item);
       }
 
     };
+
+    return deferred.promise;
 
   };
 

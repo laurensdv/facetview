@@ -20,6 +20,8 @@
 
   <script type="text/javascript" src="ldf-client-ui.js"></script>
 
+    <script type="text/javascript" src="ldf-client-facets.js"></script>
+
   <script type="text/javascript" src="jquery.facetview.js"></script>
 
   <link rel="stylesheet" href="css/facetview.css">
@@ -30,22 +32,20 @@ jQuery(document).ready(function($, Q) {
       console.log("received callback");
       console.log(target);
   };
-    var ldfClientUi = new LinkedDataFragmentsClientUI("#overview", "SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
-  ldfClientUi.activate();
+  var ldfClientUiMain = new LinkedDataFragmentsClientUI("#overview", "SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
+  ldfClientUiMain.activate();
   $('.facet-view-simple').facetview({
-    search_url: '',
+    search_url: 'http://data.linkeddatafragments.org/dbpedia',
     search_index: 'ldf',
     facets: [
-        {'field': ':publisher', 'size': 100, 'order':'term', 'display': 'publisher'},
-        {'field': ':author', 'display': 'author'},
-        {'field': ':year', 'display': 'year'},
-        {'field': ':collection', 'display': 'collection'},
+        {'field': 'rdf:type', 'size': 5, 'order':'term', 'display': 'type'},
+        {'field': 'dcterms:subject', 'size' : 10, 'display': 'category'},
     ],
     paging: {
       size: 10
     },
     predefined_filters: {
-        'owner.exact': {'term':{':owner':'test'}}
+        'owner.exact': {'term':{'rdf:type':'dbpedia-owl:Person'}}
     }
   });
 
@@ -62,8 +62,9 @@ jQuery(document).ready(function($, Q) {
 
 </head>
 <body>
+    <div id="overview"><div class="results"></div></div>
 
     <div class="facet-view-simple"></div>
-    <div id="overview"><div class="results"></div></div>
+
 </body>
 </html>
