@@ -1031,7 +1031,7 @@ search box - the end user will not know they are happening.
 
         var generateSPARQL = function(qs, extra) {
             if(extra.field.length > 0) {
-              qy = "select ?o where \{ ";
+              qy = "select distinct ?o where \{ ";
             } else {
               qy = "select * where \{ ";
             }

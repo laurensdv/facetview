@@ -29,6 +29,10 @@ var LinkedDataFragmentsClientFacets = (function ($) {
      "dbpedia":     "http://dbpedia.org/resource/",
      "dbpedia-owl": "http://dbpedia.org/ontology/",
      "dbpprop":     "http://dbpedia.org/property/",
+     "regorg":      "http://www.w3.org/ns/regorg#",
+     "kbo":         "http://data.kbodata.be/def#",
+     "oslo":        "http://purl.org/oslo/ns/localgov#",
+     "org":         "http://www.w3.org/ns/org#"
     };
 
     console.log("created new client");
