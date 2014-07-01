@@ -8,6 +8,8 @@ var LinkedDataFragmentsClientUI = (function ($) {
       Logger = ldf.Logger,
       N3 = require('n3');
 
+  Logger.disable();
+
   // Creates a new Linked Data Fragments Client UI
   function LinkedDataFragmentsClientUI(element, query, startFragment, callback, facet) {
     this.query = query;

@@ -28,18 +28,19 @@
 
   <script type="text/javascript">
 jQuery(document).ready(function($, Q) {
-      var callback = function (target) {
+  var callback = function (target) {
       console.log("received callback");
       console.log(target);
   };
-  var ldfClientUiMain = new LinkedDataFragmentsClientUI("#overview", "SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
+  var ldfClientUiMain = new LinkedDataFragmentsClientUI(null, "SELECT DISTINCT ?o WHERE \{ ?s rdf:type ?o \} LIMIT 10","http://data.linkeddatafragments.org/dbpedia", callback);
   ldfClientUiMain.activate();
   $('.facet-view-simple').facetview({
     search_url: 'http://data.linkeddatafragments.org/dbpedia',
     search_index: 'ldf',
     facets: [
-        {'field': 'rdf:type', 'size': 5, 'order':'term', 'display': 'type'},
-        {'field': 'dcterms:subject', 'size' : 10, 'display': 'category'},
+        {'field': 'rdf:type', 'size': 7, 'order':'term', 'display': 'type'},
+        {'field': 'dcterms:subject', 'size' : 14, 'display': 'category'},
+        {'field': 'dbpedia-owl:birthPlace', 'size' : 7, 'display': 'country'}
     ],
     paging: {
       size: 10

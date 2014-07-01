@@ -348,6 +348,13 @@ search box - the end user will not know they are happening.
                     }
                 ],
                 [
+                   {
+                        "pre": "<p>",
+                        "field": "?d",
+                        "post": "</p>"
+                    }
+                ],
+                [
                     {
                       "pre": '<a href="',
                       "field": "?s",
@@ -356,6 +363,8 @@ search box - the end user will not know they are happening.
                 ]
             ];
 
+        var thumbnail_property = "dbpedia-owl:thumbnail"
+        var description_property = "rdfs:comment"
 
         // specify the defaults
         var defaults = {
@@ -399,7 +408,7 @@ search box - the end user will not know they are happening.
             "post_search_callback": false,
             "pushstate": true,
             "linkify": false,
-            "default_operator": "OR",
+            "default_operator": "AND",
             "default_freetext_fuzzify": false
         };
 
@@ -660,7 +669,7 @@ search box - the end user will not know they are happening.
             newobj += '" rel="' + rel +
                 '" alt="remove" title="remove"' +
                 ' href="' + href + '">' +
-                href + ' <i class="icon-white icon-remove" style="margin-top:1px;"></i></a>';
+                uriToLabel(href) + ' <i class="icon-white icon-remove" style="margin-top:1px;"></i></a>';
 
             if ( $('#facetview_group_' + relclean, obj).length ) {
                 $('#facetview_group_' + relclean, obj).append(newobj);
@@ -804,11 +813,17 @@ search box - the end user will not know they are happening.
             var result = options.resultwrap_start;
             // add first image where available
             if (options.display_images) {
-                var recstr = JSON.stringify(record);
-                var regex = /(http:\/\/\S+?\.(jpg|png|gif|jpeg))/;
-                var img = regex.exec(recstr);
+                //var recstr = JSON.stringify(record);
+                //var regex = /(http:\/\/\S+?\.(jpg|png|gif|jpeg|JPG|GIF|PNG|JPEG))/;
+                //var img = regex.exec(recstr);
+                var img = false;
+                if('?t' in record) {
+                  img = record["?t"];
+                }
                 if (img) {
-                    result += '<img class="thumbnail" style="float:left; width:100px; margin:0 5px 10px 0; max-height:150px;" src="' + img[0] + '" />';
+                    //result += '<img class="thumbnail" style="float:left; width:100px; margin:0 5px 10px 0; max-height:150px;" src="' + img[0] + '" />';
+                    result += '<img class="thumbnail" style="float:left; width:100px; margin:0 5px 10px 0; max-height:150px;" src="' + img + '" />';
+
                 }
             }
             // add the record based on display template if available
@@ -851,6 +866,25 @@ search box - the end user will not know they are happening.
 
         }
 
+        var uriToLabel = function(uri) {
+	      	if (typeof uri !== 'undefined') {
+			      uri = uri.replace("<", "");
+	  		    uri = uri.replace(">", "");
+
+	    		var label = uri;
+
+          if (uri.indexOf("http://") === 0) {
+				    label = uri.substr(uri.lastIndexOf("/") + 1);
+				    label = label.replace(/[&\/\,+()$~%.'":*?<>{}_]/g, ' ');
+          var hashPos = label.lastIndexOf("#");
+				  if (hashPos > -1) {
+					  label = label.substr(hashPos + 1);
+				  }
+		    	}
+			  return label;
+		    }
+	      };
+
         // put the results on the page
         var showresults = function(sdata, other) {
             options.rawdata = sdata;
@@ -869,7 +903,7 @@ search box - the end user will not know they are happening.
                 var records = data["facets"][ facet ];
                 for ( var item in records ) {
                     var append = '<tr class="facetview_filtervalue" style="display:none;"><td><a class="facetview_filterchoice' +
-                        '" rel="' + facet + '" href="' + item + '">' + item +
+                        '" rel="' + facet + '" href="' + item + '">' + uriToLabel(item) +
                         ' (' + records[item] + ')</a></td></tr>';
                     facet_filter.append(append);
                 }
@@ -981,16 +1015,9 @@ search box - the end user will not know they are happening.
             return rqs;
         };
 
-        var generateSPARQL = function(qs, extra) {
-            if(extra.field.length > 0) {
-              qy = "select ?o where \{ ";
-            } else {
-              qy = "select * where \{ ";
-            }
-            var count = 0;
-            $.each(qs.query.bool.must, function(key, query_part) {
-              $.each(query_part.term, function(key, obj) {
-                if(is_valid_url(obj)) {
+        var genQueryLine = function(key, obj) {
+          var qy = "";
+          if(is_valid_url(obj)) {
                   if(obj.indexOf('/') >= 0) {
                        qy += " ?s" + " " + key + " <" + obj + "> . ";
                     } else {
@@ -999,9 +1026,40 @@ search box - the end user will not know they are happening.
                 } else {
                   qy += " ?s" + " " + key + " \"" + obj +"\" . ";
                 }
-                qy += " ?s" + " rdfs:label ?l" + " . ";
+          return qy;
+        };
+
+        var generateSPARQL = function(qs, extra) {
+            if(extra.field.length > 0) {
+              qy = "select ?o where \{ ";
+            } else {
+              qy = "select * where \{ ";
+            }
+            var count = 0;
+            $.each(qs.query.bool.must, function(i, query_part) {
+              if ('bool' in query_part) {
+
+                $.each(query_part.bool.should, function(j, sub_part) {
+
+                  if('term' in sub_part) {
+                      qy += " OPTIONAL {";
+                      $.each(sub_part.term, function(key, obj) {
+                        qy += genQueryLine(key, obj);
+                      });
+                      qy += " } .";
+                  };
+
+                });
+
+              } else {
+              $.each(query_part.term, function(key, obj) {
+                qy += genQueryLine(key, obj);
               });
+            }
             });
+            qy += " ?s" + " rdfs:label ?l" + " . ";
+            qy += "OPTIONAL { ?s " + thumbnail_property + " ?t" + " } . ";
+            qy += "OPTIONAL { ?s " + description_property + " ?d" + " } . ";
             if(extra.field.length > 0) {
               qy += " ?s " + extra.field + " ?o" + " . ";
               //qy += " ?o " + "rdfs:label ?lo" + " . ";
