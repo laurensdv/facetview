@@ -1052,9 +1052,11 @@ search box - the end user will not know they are happening.
                 });
 
               } else {
-              $.each(query_part.term, function(key, obj) {
-                qy += genQueryLine(key, obj);
-              });
+              if ('term' in query_part) {
+                  $.each(query_part.term, function(key, obj) {
+                    qy += genQueryLine(key, obj);
+                  });
+                };
             }
             });
             qy += " ?s" + " rdfs:label ?l" + " . ";
