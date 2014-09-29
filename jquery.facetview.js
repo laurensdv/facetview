@@ -334,6 +334,7 @@ search box - the end user will not know they are happening.
 
 // now the facetview function
 (function($){
+
     $.fn.facetview = function(options) {
 
         // a big default value (pulled into options below)
@@ -682,6 +683,7 @@ search box - the end user will not know they are happening.
             $('.facetview_filterselected', obj).unbind('click',clearfilter);
             $('.facetview_filterselected', obj).bind('click',clearfilter);
             if ( event ) {
+                clearresults();
                 options.paging.from = 0;
                 dosearch();
             };
@@ -695,6 +697,7 @@ search box - the end user will not know they are happening.
             } else {
                 $(this).remove();
             }
+            clearresults();
             dosearch();
         };
 
@@ -703,27 +706,37 @@ search box - the end user will not know they are happening.
         // ===============================================
 
 
+        var resultobj = {};
+        resultobj["facets"] = {};
+        resultobj["records"] = [];
+        resultobj["start"] = 0;
+        resultobj["found"] = 0;
+        var found = 0;
 
+        var clearresults = function() {
+            resultobj["facets"] = {};
+            resultobj["records"] = [];
+            found = 0;
+            $('#facetview_results',obj).html("");
+        }
 
         // read the result object and return useful vals
         // returns an object that contains things like ["data"] and ["facets"]
         var parseresults = function(dataobj) {
             var deferred = Q.defer();
-            var resultobj = {};
-            resultobj["records"] = [];
-            resultobj["start"] = "";
-            resultobj["found"] = "";
-            resultobj["facets"] = {};
             var counts = [];
             var deferredF = [];
 
             var setfacetcounts = function(pattern, metadata) {
               if (pattern.predicate in resultobj["facets"]) {
-                resultobj["facets"][pattern.predicate][pattern.object] = metadata.totalTriples;
+                if(!(pattern.object in resultobj["facets"][pattern.predicate])) {
+                    resultobj["facets"][pattern.predicate][pattern.object] = metadata.totalTriples;
+                }
               } else {
                 resultobj["facets"][pattern.predicate] = new Object();
                 resultobj["facets"][pattern.predicate][pattern.object] = metadata.totalTriples;
               }
+              showresults(resultobj);
             };
 
 
@@ -736,18 +749,22 @@ search box - the end user will not know they are happening.
               }
             };
 
+            var countoccurrencesInstant = function(data, facet) {
+                var facet_uri = facet;
+                var facet_instance =  data["?o"];
+                var ldfF = new LinkedDataFragmentsClientFacets("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
+                counts.push(ldfF.activate());
+            };
 
-            for ( var item = 0; item < dataobj.length; item++ ) {
-                resultobj["records"].push(dataobj[item]);
-            }
-
+            found++;
+            resultobj["records"].push(dataobj);
             resultobj["start"] = options.paging.from;
-            resultobj["found"] = dataobj.length + options.paging.from + 1;
-
+            resultobj["found"] = found + options.paging.from + 1;
+            showresults(resultobj, true);
 
             for (var item in options.facets) {
                 var query = generateSPARQL(options.last_qs, options.facets[item]);
-                var ldfQ = new LinkedDataFragmentsClientUI(null, query, options.search_url, countoccurrences, options.facets[item].field);
+                var ldfQ = new LinkedDataFragmentsClientUI(null, query, options.search_url, countoccurrencesInstant, options.facets[item].field);
                 deferredF.push(ldfQ.activate());
             }
 
@@ -764,6 +781,7 @@ search box - the end user will not know they are happening.
         var decrement = function(event) {
             event.preventDefault();
             if ( $(this).html() != '..' ) {
+                clearresults();
                 options.paging.from = options.paging.from - options.paging.size;
                 options.paging.from < 0 ? options.paging.from = 0 : "";
                 dosearch();
@@ -773,6 +791,7 @@ search box - the end user will not know they are happening.
         var increment = function(event) {
             event.preventDefault();
             if ( $(this).html() != '..' ) {
+                clearresults();
                 options.paging.from = parseInt($(this).attr('href'));
                 dosearch();
             }
@@ -892,8 +911,9 @@ search box - the end user will not know they are happening.
             //var data = parseresults(sdata);
             //options.data = data;
 
-            Q.when(parseresults(sdata), function(data) {
-            options.data = data;
+            //Q.when(parseresults(sdata), function(data) {
+            options.data = sdata;
+            var data = sdata;
             // for each filter setup, find the results for it and append them to the relevant filter
             for ( var each = 0; each < options.facets.length; each++ ) {
                 var facet = options.facets[each]['field'];
@@ -962,28 +982,33 @@ search box - the end user will not know they are happening.
             }
 
             // put the filtered results on the page
-            $('#facetview_results',obj).html("");
+            // $('#facetview_results',obj).html("");
             var infofiltervals = new Array();
             var records_size = data.records.length;
-            for(var index = 0; index < data.records.length; index++) {
-                // write them out to the results div
-                 $('#facetview_results', obj).append( buildrecord(index) );
-                 options.linkify ? $('#facetview_results tr:last-child', obj).linkify() : false;
-            };
-            if ( options.result_box_colours.length > 0 ) {
-                jQuery('.result_box', obj).each(function () {
-                    var colour = options.result_box_colours[Math.floor(Math.random()*options.result_box_colours.length)] ;
-                    jQuery(this).css("background-color", colour);
-                });
+            if(other !== undefined) {
+                if(data.records.length == 1) {
+                    $('#facetview_results',obj).html("");
+                }
+                for(var index = (data.records.length - 1); index < data.records.length; index++) {
+                    // write them out to the results div
+                    $('#facetview_results', obj).append( buildrecord(index) );
+                    options.linkify ? $('#facetview_results tr:last-child', obj).linkify() : false;
+                };
+                if ( options.result_box_colours.length > 0 ) {
+                    jQuery('.result_box', obj).each(function () {
+                        var colour = options.result_box_colours[Math.floor(Math.random()*options.result_box_colours.length)] ;
+                        jQuery(this).css("background-color", colour);
+                    });
+                }
+                //$('#facetview_results', obj).children().hide().fadeIn(options.fadein);
+                $('.facetview_viewrecord', obj).bind('click',viewrecord);
+                jQuery('.notify_loading').hide();
+                // if a post search callback is provided, run it
+                if (typeof options.post_search_callback == 'function') {
+                    options.post_search_callback.call(this);
+                }
             }
-            $('#facetview_results', obj).children().hide().fadeIn(options.fadein);
-            $('.facetview_viewrecord', obj).bind('click',viewrecord);
-            jQuery('.notify_loading').hide();
-            // if a post search callback is provided, run it
-            if (typeof options.post_search_callback == 'function') {
-                options.post_search_callback.call(this);
-            }
-          });
+          //});
 
         };
 
@@ -1384,7 +1409,7 @@ search box - the end user will not know they are happening.
                 window.history.pushState("","search",currurl);
             };
             console.log(qrystr);
-            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr , options.search_url, showresults, null);
+            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr , options.search_url, parseresults, null);
             ldfClientUi.activate();
         };
 
@@ -1423,6 +1448,7 @@ search box - the end user will not know they are happening.
         };
         var orderby = function(event) {
             event ? event.preventDefault() : "";
+            clearresults();
             var sortchoice = $('.facetview_orderby', obj).val();
             if ( sortchoice.length != 0 ) {
                 var sorting = {};
@@ -1478,6 +1504,7 @@ search box - the end user will not know they are happening.
         // adjust the search field focus
         var searchfield = function(event) {
             event.preventDefault();
+            clearresults();
             options.paging.from = 0;
             dosearch();
         };

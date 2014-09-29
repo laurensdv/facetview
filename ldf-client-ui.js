@@ -18,6 +18,7 @@ var LinkedDataFragmentsClientUI = (function ($) {
     this._facet = facet;
     this.config = {};
     this.resultsString = "";
+    this.resultsList = [];
     this.config.startFragment = startFragment;
     this.config.prefixes = {
      "rdf":         "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -51,6 +52,7 @@ var LinkedDataFragmentsClientUI = (function ($) {
       var config = this.config;
       var callback = this._callback;
       var resultString = this.resultsString;
+      var resultsList = this.resultsList;
       var $results = this._$element.find('.results');
       var facet = this._facet;
 
@@ -64,13 +66,16 @@ var LinkedDataFragmentsClientUI = (function ($) {
       switch (sparqlIterator.parsedQuery.type) {
         // Write a JSON array representation of the rows
         case 'SELECT':
-          var resultsCount = 0;
-          addToResults('[');
+          //var resultsCount = 0;
+          //addToResults('[');
           sparqlIterator.on('data', function (row) {
-          addToResults(resultsCount++ ? ',\n' : '\n', row);
+            resultsList.push(row);
+            callback(row, facet);
+            //addToResults(resultsCount++ ? ',\n' : '\n', row);
           });
           sparqlIterator.on('end', function () {
-            addToResults(resultsCount ? '\n]' : ']');
+            deferred.resolve();
+            //addToResults(resultsCount ? '\n]' : ']');
           });
         break;
         // Write an RDF representation of all results
@@ -84,34 +89,42 @@ var LinkedDataFragmentsClientUI = (function ($) {
         default:
           throw new Error('Unsupported query type: ' + sparqlIterator.parsedQuery.type);
       }
-      sparqlIterator.on('end', function () {
-          console.log('done');
-          if(resultString == "") {
-              callback({}, null);
-              deferred.resolve();
-          } else {
-              resultString = resultString.replace('\n]\n]', '\n]');
-              var resultObj = JSON.parse(resultString);
-              callback(resultObj, facet);
-              deferred.resolve();
-          }
-      });
+      // sparqlIterator.on('end', function () {
+      //     console.log('done');
+      //     if(resultsList.length == 0) {
+      //       callback({}, null);
+      //       deferred.resolve();
+      //     } else {
+      //       callback(resultsList, facet);
+      //       deferred.resolve();
+      //     }
+      //     // if(resultString == "") {
+      //     //     callback({}, null);
+      //     //     deferred.resolve();
+      //     // } else {
+      //     //     resultString = resultString.replace('\n]\n]', '\n]');
+      //     //     var resultObj = JSON.parse(resultString);
+      //     //     callback(resultObj, facet);
+      //     //     deferred.resolve();
+      //     // }
+      // });
       sparqlIterator.on('error', function (error) { console.log(error.message); throw error; });
       sparqlIterator.read();
 
     // Add text to the results
-    function addToResults() {
+    // function addToResults() {
 
-      for (var i = 0, l = arguments.length; i < l; i++) {
-        var item = arguments[i];
-        if (typeof item !== 'string')
-          item = JSON.stringify(item, null, '  ');
-        console.log(item);
-        resultString += item;
-        $results.append(item);
-      }
+    //   for (var i = 0, l = arguments.length; i < l; i++) {
+    //     var item = arguments[i];
+        
+    //     if (typeof item !== 'string')
+    //       item = JSON.stringify(item, null, '  ');
+    //     console.log(item);
+    //     resultString += item;
+    //     $results.append(item);
+    //   }
 
-    };
+    // };
 
     return deferred.promise;
 
