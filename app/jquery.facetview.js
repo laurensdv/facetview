@@ -1093,11 +1093,13 @@ search box - the end user will not know they are happening.
                 }
             }
 
-            if (options.thumbnail_property) {
-                qy += "OPTIONAL { ?s " + options.thumbnail_property + " ?t" + " } . ";
-            }
-            if (options.description_property) {
-                qy += "OPTIONAL { ?s " + options.description_property + " ?d" + " } . ";
+            if(Array.isArray(extra)) {
+                if (options.thumbnail_property) {
+                    qy += "OPTIONAL { ?s " + options.thumbnail_property + " ?t" + " } . ";
+                }
+                if (options.description_property) {
+                    qy += "OPTIONAL { ?s " + options.description_property + " ?d" + " } . ";
+                }
             }
 
             qy += " \} ";
