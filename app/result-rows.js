@@ -1,23 +1,20 @@
-/*! @license Â©2013 Ruben Verborgh - Multimedia Lab / iMinds / Ghent University */
-/** Browser interface for the LDF client. */
+/** Class that fetches the result rows */
 
-var LinkedDataFragmentsClientUI = (function ($) {
-  var ldf = require('ldf-client'),
+var ResultRowFetcher = (function ($) {
+  var ldf = window.ldf,
       SparqlIterator = ldf.SparqlIterator,
       FragmentsClient = ldf.FragmentsClient,
-      Logger = ldf.Logger,
-      N3 = require('n3');
+      Logger = ldf.Logger;
 
-  Logger.disable();
+  Logger.setLevel('WARNING');
 
   // Creates a new Linked Data Fragments Client UI
-  function LinkedDataFragmentsClientUI(element, query, startFragment, callback, facet) {
+  function ResultRowFetcher(element, query, startFragment, callback, facet) {
     this.query = query;
     this._$element = $(element);
     this._callback = callback;
     this._facet = facet;
     this.config = {};
-    this.resultsString = "";
     this.resultsList = [];
     this.config.startFragment = startFragment;
     this.config.prefixes = {
@@ -45,90 +42,46 @@ var LinkedDataFragmentsClientUI = (function ($) {
   }
 
   // Activates the Linked Data Fragments Client UI
-  LinkedDataFragmentsClientUI.prototype.activate = function () {
+  ResultRowFetcher.prototype.activate = function () {
       var deferred = Q.defer();
       var query = this.query;
-      var startFragment = this.startFragment;
       var config = this.config;
       var callback = this._callback;
-      var resultString = this.resultsString;
       var resultsList = this.resultsList;
       var $results = this._$element.find('.results');
       var facet = this._facet;
 
-      resultString = "";
       $results.empty();
 
       console.log("activated new client");
       // Create the iterator to solve the query
       config.fragmentsClient = new FragmentsClient(config.startFragment, config);
       var sparqlIterator = new SparqlIterator(query, config);
-      switch (sparqlIterator.parsedQuery.type) {
+      switch (sparqlIterator.queryType) {
         // Write a JSON array representation of the rows
         case 'SELECT':
-          //var resultsCount = 0;
-          //addToResults('[');
           sparqlIterator.on('data', function (row) {
             resultsList.push(row);
             callback(row, facet);
-            //addToResults(resultsCount++ ? ',\n' : '\n', row);
           });
           sparqlIterator.on('end', function () {
             deferred.resolve();
-            //addToResults(resultsCount ? '\n]' : ']');
           });
         break;
         // Write an RDF representation of all results
         case 'CONSTRUCT':
-          var writer = new N3.Writer({ write: function (chunk, encoding, done) {
-            addToResults(chunk), done && done();
-          }}, config.prefixes);
-          sparqlIterator.on('data', function (triple) { writer.addTriple(triple); })
-                        .on('end',  function () { writer.end(); });
+          throw new Error('Unsupported query type: ' + sparqlIterator.parsedQuery.type);
         break;
         default:
           throw new Error('Unsupported query type: ' + sparqlIterator.parsedQuery.type);
       }
-      // sparqlIterator.on('end', function () {
-      //     console.log('done');
-      //     if(resultsList.length == 0) {
-      //       callback({}, null);
-      //       deferred.resolve();
-      //     } else {
-      //       callback(resultsList, facet);
-      //       deferred.resolve();
-      //     }
-      //     // if(resultString == "") {
-      //     //     callback({}, null);
-      //     //     deferred.resolve();
-      //     // } else {
-      //     //     resultString = resultString.replace('\n]\n]', '\n]');
-      //     //     var resultObj = JSON.parse(resultString);
-      //     //     callback(resultObj, facet);
-      //     //     deferred.resolve();
-      //     // }
-      // });
-      sparqlIterator.on('error', function (error) { console.log(error.message); throw error; });
+
+      sparqlIterator.on('error', function (error) { console.log(error.message); });
       sparqlIterator.read();
-
-    // Add text to the results
-    // function addToResults() {
-
-    //   for (var i = 0, l = arguments.length; i < l; i++) {
-    //     var item = arguments[i];
-        
-    //     if (typeof item !== 'string')
-    //       item = JSON.stringify(item, null, '  ');
-    //     console.log(item);
-    //     resultString += item;
-    //     $results.append(item);
-    //   }
-
-    // };
 
     return deferred.promise;
 
   };
 
-  return LinkedDataFragmentsClientUI;
+  return ResultRowFetcher;
 })(jQuery);

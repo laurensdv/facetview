@@ -340,36 +340,13 @@ search box - the end user will not know they are happening.
         // a big default value (pulled into options below)
         // demonstrates how to specify an output style based on the fields that can be found in the result object
         // where a specified field is not found, the pre and post for it are just ignored
-        var resdisplay = [
-                [
-                    {
-                        "pre": "<strong>",
-                        "field": "?l",
-                        "post": "</strong>"
-                    }
-                ],
-                [
-                   {
-                        "pre": "<p>",
-                        "field": "?d",
-                        "post": "</p>"
-                    }
-                ],
-                [
-                    {
-                      "pre": '<a href="',
-                      "field": "?s",
-                      "post": '">More information</a>'
-                    }
-                ]
-            ];
-
-        var thumbnail_property = "dbpedia-owl:thumbnail"
-        var description_property = "rdfs:comment"
 
         // specify the defaults
         var defaults = {
+            "thumbnail_property": false,
+            "description_property": "rdfs:comment",
             "config_file": false,
+            "result_properties": [],
             "embedded_search": true,
             "searchbox_class": "",
             "searchbox_fieldselect": [],
@@ -381,8 +358,30 @@ search box - the end user will not know they are happening.
             "extra_facets": {},
             "enable_rangeselect": false,
             "include_facets_in_querystring": false,
-            "result_display": resdisplay,
-            "display_images": true,
+            "result_display": [
+                [
+                    {
+                        "pre": "<strong>",
+                        "field": "?l",
+                        "post": "</strong>"
+                    }
+                ],
+                [
+                    {
+                        "pre": "<p>",
+                        "field": "?d",
+                        "post": "</p>"
+                    }
+                ],
+                [
+                    {
+                        "pre": '<a href="',
+                        "field": "?s",
+                        "post": '">More information</a>'
+                    }
+                ]
+            ],
+            "display_images": false,
             "search_url":"",
             "datatype":"jsonp",
             "initialsearch":true,
@@ -426,7 +425,7 @@ search box - the end user will not know they are happening.
         var is_valid_url = function (url)
         {
            return url.match("([A-Za-z][A-Za-z0-9+\\-.]*):(?:(//)(?:((?:[A-Za-z0-9\\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*)@)?((?:\\[(?:(?:(?:(?:[0-9A-Fa-f]{1,4}:){6}|::(?:[0-9A-Fa-f]{1,4}:){5}|(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,1}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){3}|(?:(?:[0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){2}|(?:(?:[0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}:|(?:(?:[0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})?::)(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(?:(?:[0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})?::)|[Vv][0-9A-Fa-f]+\\.[A-Za-z0-9\\-._~!$&'()*+,;=:]+)\\]|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:[A-Za-z0-9\\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*))(?::([0-9]*))?((?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)|/((?:(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)?)|((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:/(?:[A-Za-z0-9\\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)|)(?:\\?((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*))?(?:\\#((?:[A-Za-z0-9\\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*))?");
-        }
+        };
 
 
         // ===============================================
@@ -718,7 +717,7 @@ search box - the end user will not know they are happening.
             resultobj["records"] = [];
             found = 0;
             $('#facetview_results',obj).html("");
-        }
+        };
 
         // read the result object and return useful vals
         // returns an object that contains things like ["data"] and ["facets"]
@@ -744,7 +743,7 @@ search box - the end user will not know they are happening.
               for ( var item = 0; item < data.length; item++ ) {
                 var facet_uri = facet;
                 var facet_instance =  data[item]["?o"];
-                var ldfF = new LinkedDataFragmentsClientFacets("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
+                var ldfF = new FacetFetcher("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
                 counts.push(ldfF.activate());
               }
             };
@@ -752,7 +751,7 @@ search box - the end user will not know they are happening.
             var countoccurrencesInstant = function(data, facet) {
                 var facet_uri = facet;
                 var facet_instance =  data["?o"];
-                var ldfF = new LinkedDataFragmentsClientFacets("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
+                var ldfF = new FacetFetcher("?s",facet_uri,facet_instance,options.search_url,setfacetcounts);
                 counts.push(ldfF.activate());
             };
 
@@ -764,7 +763,7 @@ search box - the end user will not know they are happening.
 
             for (var item in options.facets) {
                 var query = generateSPARQL(options.last_qs, options.facets[item]);
-                var ldfQ = new LinkedDataFragmentsClientUI(null, query, options.search_url, countoccurrencesInstant, options.facets[item].field);
+                var ldfQ = new ResultRowFetcher(null, query, options.search_url, countoccurrencesInstant, options.facets[item].field);
                 deferredF.push(ldfQ.activate());
             }
 
@@ -883,7 +882,7 @@ search box - the end user will not know they are happening.
             var record = options.data['records'][$(this).attr('href')];
             alert(JSON.stringify(record,"","    "));
 
-        }
+        };
 
         var uriToLabel = function(uri) {
 	      	if (typeof uri !== 'undefined') {
@@ -1031,12 +1030,11 @@ search box - the end user will not know they are happening.
                                 options.default_freetext_fuzzify == "*" ? oip = "*" + oip : false;
                                 pq += oip + " ";
                             }
-                        };
+                        }
                         rqs = pq;
-                    };
-
-                };
-            };
+                    }
+                }
+            }
             return rqs;
         };
 
@@ -1055,12 +1053,13 @@ search box - the end user will not know they are happening.
         };
 
         var generateSPARQL = function(qs, extra) {
-            if(extra.field.length > 0) {
-              qy = "select distinct ?o where \{ ";
-            } else {
+            var qy = "";
+            if(Array.isArray(extra)) {
               qy = "select * where \{ ";
+            } else {
+              qy = "select distinct ?o where \{ ";
             }
-            var count = 0;
+
             $.each(qs.query.bool.must, function(i, query_part) {
               if ('bool' in query_part) {
 
@@ -1072,7 +1071,7 @@ search box - the end user will not know they are happening.
                         qy += genQueryLine(key, obj);
                       });
                       qy += " } .";
-                  };
+                  }
 
                 });
 
@@ -1081,26 +1080,36 @@ search box - the end user will not know they are happening.
                   $.each(query_part.term, function(key, obj) {
                     qy += genQueryLine(key, obj);
                   });
-                };
+                }
             }
             });
-            qy += " ?s" + " rdfs:label ?l" + " . ";
-            qy += "OPTIONAL { ?s " + thumbnail_property + " ?t" + " } . ";
-            qy += "OPTIONAL { ?s " + description_property + " ?d" + " } . ";
-            if(extra.field.length > 0) {
-              qy += " ?s " + extra.field + " ?o" + " . ";
-              //qy += " ?o " + "rdfs:label ?lo" + " . ";
-            }
-            qy += " \} ";
-            if(extra.field.length === 0) {
-               qy += " LIMIT " + options.paging.size;
-               qy += " OFFSET " + options.paging.from;
+            if (Array.isArray(extra)) {
+                for (var result_property in extra) {
+                    qy += " ?s " + extra[result_property].field + " ?" + extra[result_property].selector + " . ";
+                }
             } else {
-               qy += " GROUP BY ?o LIMIT " + extra.size;
+                if(extra.field.length > 0) {
+                    qy += " ?s " + extra.field + " ?o" + " . ";
+                }
+            }
+
+            if (options.thumbnail_property) {
+                qy += "OPTIONAL { ?s " + options.thumbnail_property + " ?t" + " } . ";
+            }
+            if (options.description_property) {
+                qy += "OPTIONAL { ?s " + options.description_property + " ?d" + " } . ";
+            }
+
+            qy += " \} ";
+            if(!Array.isArray(extra)) {
+                qy += " GROUP BY ?o LIMIT " + extra.size;
+            } else {
+                qy += " LIMIT " + options.paging.size;
+                qy += " OFFSET " + options.paging.from;
             }
             console.log(qy);
             return qy
-        }
+        };
 
          // build the search query URL based on current params
         var ldfsearchquery = function() {
@@ -1240,7 +1249,7 @@ search box - the end user will not know they are happening.
             }
 
             //qy = JSON.stringify(qs);
-          qy = generateSPARQL(qs, {field : ""});
+            var qy = generateSPARQL(qs, options.result_properties);
             //options.querystring = qy;
             options.last_qs = qs;
             options.querystring = JSON.stringify(qs);
@@ -1409,7 +1418,7 @@ search box - the end user will not know they are happening.
                 window.history.pushState("","search",currurl);
             };
             console.log(qrystr);
-            var ldfClientUi = new LinkedDataFragmentsClientUI(null, qrystr , options.search_url, parseresults, null);
+            var ldfClientUi = new ResultRowFetcher(null, qrystr , options.search_url, parseresults, null);
             ldfClientUi.activate();
         };
 

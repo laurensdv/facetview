@@ -1,19 +1,13 @@
-/*! @license Â©2013 Ruben Verborgh - Multimedia Lab / iMinds / Ghent University */
-/** Browser interface for the LDF client. */
+/** Class that fetches the facets */
 
-var LinkedDataFragmentsClientFacets = (function ($) {
-  var ldf = require('ldf-client'),
-      SparqlIterator = ldf.SparqlIterator,
-      FragmentsClient = ldf.FragmentsClient,
-      Logger = ldf.Logger,
-      N3 = require('n3');
+var FacetFetcher = (function () {
+  var ldf = window.ldf,
+      FragmentsClient = ldf.FragmentsClient;
 
-  // Creates a new Linked Data Fragments Client UI
-  function LinkedDataFragmentsClientFacets(subject, predicate, objVal, startFragment, callback) {
+  function FacetFetcher(subject, predicate, objVal, startFragment, callback) {
     this.pattern = { 'subject' : subject, 'predicate' : predicate, 'object' : objVal };
     this._callback = callback;
     this.config = {};
-    this.resultsString = "";
     this.config.startFragment = startFragment;
     this.config.prefixes = {
      "rdf":         "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -39,9 +33,8 @@ var LinkedDataFragmentsClientFacets = (function ($) {
   }
 
   // Activates the Linked Data Fragments Client UI
-  LinkedDataFragmentsClientFacets.prototype.activate = function () {
+  FacetFetcher.prototype.activate = function () {
       var pattern = this.pattern;
-      var startFragment = this.startFragment;
       var config = this.config;
       var callback = this._callback;
       var deferred = Q.defer();
@@ -62,5 +55,5 @@ var LinkedDataFragmentsClientFacets = (function ($) {
       return deferred.promise;
   };
 
-  return LinkedDataFragmentsClientFacets;
+  return FacetFetcher;
 })(jQuery);

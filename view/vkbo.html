@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>FacetView</title>
+
+  <script type="text/javascript" src="../vendor/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+
+  <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
+  <script type="text/javascript" src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="../vendor/linkify/1.0/jquery.linkify-1.0-min.js"></script>
+
+  <link rel="stylesheet" href="../vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css">
+  <script type="text/javascript" src="../vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js"></script>
+
+  <script type="text/javascript" src="../vendor/q/q.min.js"></script>
+  <script type="text/javascript" src="../vendor/ldf-client/js/ldf-client.js"></script>
+  <script type="text/javascript" src="../app/result-rows.js"></script>
+  <script type="text/javascript" src="../app/facets.js"></script>
+
+  <script type="text/javascript" src="../app/jquery.facetview.js"></script>
+
+  <link rel="stylesheet" href="../css/facetview.css">
+
+  <script type="text/javascript">
+jQuery(document).ready(function($, Q) {
+  $('.facet-view-simple').facetview({
+    search_url: 'http://ewi.mmlab.be/ba/all',
+    search_index: 'ldf',
+    display_images: false,
+    thumbnail_property: false,
+    description_property: "oslo:establishmentDate",
+    result_properties: [
+      {'field': 'regorg:legalName', 'selector': 'l'},
+      {'field': 'regorg:registration', 'selector': 'r'}
+    ],
+    facets: [
+        {'field': 'regorg:orgActivity', 'size' : 10, 'display': 'Activity'},
+        // {'field': 'oslo:companyStatus', 'size' : 2, 'display': 'Legal State'},
+    ],
+    paging: {
+      size: 10
+    },
+    result_display: [
+      [
+        {
+          "pre": "<strong>",
+          "field": "?l",
+          "post": "</strong>"
+        }
+      ],
+      [
+        {
+          "pre": "<strong>",
+          "field": "?r",
+          "post": "</strong>"
+        }
+      ],
+      [
+        {
+          "pre": "<p> Established: ",
+          "field": "?d",
+          "post": "</p>"
+        }
+      ],
+      [
+        {
+          "pre": '<a href="',
+          "field": "?s",
+          "post": '">More information</a>'
+        }
+      ]
+    ],
+    predefined_filters: {
+      'type.exact': {'term':{'rdf:type':'oslo:Organization'}}
+    }
+  });
+
+});
+  </script>
+
+<style type="text/css">
+.facet-view-simple{
+    width:800px;
+    height:600px;
+    margin:20px auto 0 auto;
+}
+</style>
+
+</head>
+<body>
+    <div id="overview"><div class="results"></div></div>
+
+    <div class="facet-view-simple"></div>
+
+</body>
+</html>

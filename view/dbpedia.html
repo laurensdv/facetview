@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>FacetView</title>
+
+  <script type="text/javascript" src="../vendor/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+
+  <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
+  <script type="text/javascript" src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="../css/facetview.css">
+
+  <script type="text/javascript" src="../vendor/linkify/1.0/jquery.linkify-1.0-min.js"></script>
+
+  <link rel="stylesheet" href="../vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css">
+  <script type="text/javascript" src="../vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js"></script>
+
+  <script type="text/javascript" src="../vendor/q/q.min.js"></script>
+  <script type="text/javascript" src="../vendor/ldf-client/js/ldf-client.js"></script>
+  <script type="text/javascript" src="../app/result-rows.js"></script>
+  <script type="text/javascript" src="../app/facets.js"></script>
+  <script type="text/javascript" src="../app/jquery.facetview.js"></script>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function($) {
+      $('.facet-view-simple').facetview({
+        search_url: 'http://fragments.dbpedia.org/2015/en',
+        search_index: 'ldf',
+        display_images: true,
+        thumbnail_property: "dbpedia-owl:thumbnail",
+        description_property: "rdfs:comment",
+        result_properties: [
+            {'field': 'rdfs:label', 'selector': 'l'}
+        ],
+        facets: [
+            {'field': 'rdf:type', 'size': 7, 'order':'term', 'display': 'type'},
+            {'field': 'dcterms:subject', 'size' : 14, 'display': 'category'},
+            {'field': 'dbpedia-owl:birthPlace', 'size' : 7, 'display': 'country'}
+        ],
+        paging: {
+          size: 10
+        },
+        predefined_filters: {
+            'owner.exact': {'term':{'rdf:type':'dbpedia-owl:Person'}}
+        }
+      });
+
+    });
+  </script>
+
+<style type="text/css">
+.facet-view-simple{
+    width:800px;
+    height:600px;
+    margin:20px auto 0 auto;
+}
+</style>
+
+</head>
+<body>
+    <div id="overview"><div class="results"></div></div>
+
+    <div class="facet-view-simple"></div>
+
+</body>
+</html>
